@@ -1,5 +1,5 @@
 from typing import Any, List
-from thinc.neural.ops import get_array_module
+from thinc.api import get_array_module
 from spacy.pipeline import Pipe
 from spacy.tokens import Doc
 from spacy.vocab import Vocab

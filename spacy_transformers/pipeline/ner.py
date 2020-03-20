@@ -1,6 +1,6 @@
 import spacy.pipeline
 from spacy.syntax.nn_parser import ParserModel
-from thinc.v2v import Model
+from thinc.api import Model
 from ..model_registry import get_model_function
 from ..util import PIPES
 
@@ -62,7 +62,7 @@ class TransformersEntityRecognizer(spacy.pipeline.EntityRecognizer):
         tok2vec = tok2vec_arch(**configs["tok2vec"]["config"])
         lower = lower_arch(**configs["lower"]["config"])
 
-        with Model.use_device('cpu'):
+        with Model.to_cpu():
             upper = upper_arch(**configs["upper"]["config"])
         upper.W *= 0
         return ParserModel(tok2vec, lower, upper), configs

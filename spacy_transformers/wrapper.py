@@ -1,14 +1,12 @@
-from thinc.extra.wrappers import PyTorchWrapper, xp2torch, torch2xp
+from thinc.api import PyTorchShim, Optimizer, BytesIO, xp2torch, torch2xp
 from transformers.optimization import AdamW
 import transformers
 import torch.autograd
 import torch.nn.utils.clip_grad
 import torch
 from typing import Tuple, Callable, Any
-from thinc.neural.optimizers import Optimizer
 import numpy
 import contextlib
-from thinc.compat import BytesIO
 
 from .util import get_model, Dropout
 from .activations import RaggedArray, Activations
@@ -18,7 +16,7 @@ FINE_TUNE = True
 CONFIG = {"output_hidden_states": True, "output_attentions": True}
 
 
-class TransformersWrapper(PyTorchWrapper):
+class TransformersWrapper(PyTorchShim):
     """Wrap a Transformers model for use in Thinc.
 
     The model will take as input a spacy_transformers.util.RaggedArray
@@ -43,7 +41,7 @@ class TransformersWrapper(PyTorchWrapper):
         return self
 
     def __init__(self, name, config, model):
-        PyTorchWrapper.__init__(self, model)
+        PyTorchShim.__init__(self, model)
         self.cfg = dict(config)
 
     @property

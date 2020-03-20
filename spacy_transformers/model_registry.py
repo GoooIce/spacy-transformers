@@ -1,8 +1,8 @@
 from typing import Tuple, Callable, List, Optional
 from thinc.api import wrap, layerize, chain, flatten_add_lengths, with_getitem
-from thinc.t2v import Pooling, mean_pool
-from thinc.v2v import Softmax, Affine, Model
-from thinc.neural.util import get_array_module
+from thinc.api import Pooling, mean_pool
+from thinc.api import Softmax, Affine, Model
+from thinc.api import get_array_module
 from spacy.tokens import Span, Doc
 from spacy._ml import PrecomputableAffine, flatten
 import numpy
