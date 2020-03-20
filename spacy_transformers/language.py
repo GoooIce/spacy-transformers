@@ -65,7 +65,12 @@ class TransformersLanguage(Language):
         package = f"{pkg_meta['title']}>={pkg_meta['version']}"
         meta.setdefault("requirements", []).append(package)
         self.lang = meta.get("lang", "xx")
+
         self.Defaults = get_defaults(self.lang)
+
+        if self.lang is "zh":
+            self.Defaults.use_jieba = False
+            
         super().__init__(vocab, make_doc, max_length, meta=meta, **kwargs)
 
     def update(self, docs, golds, drop=0.0, sgd=None, losses=None, component_cfg={}):
