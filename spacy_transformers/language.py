@@ -65,7 +65,12 @@ class TransformersLanguage(Language):
         package = f"{pkg_meta['title']}>={pkg_meta['version']}"
         meta.setdefault("requirements", []).append(package)
         self.lang = meta.get("lang", "xx")
+
         self.Defaults = get_defaults(self.lang)
+
+        if self.lang is "zh":
+            self.Defaults.use_jieba = False
+            
         super().__init__(vocab, make_doc, max_length, meta=meta, **kwargs)
 
     def update(self, docs, golds, drop=0.0, sgd=None, losses=None, component_cfg={}):
@@ -86,6 +91,9 @@ class TransformersLanguage(Language):
                 doc = self.make_doc(doc)
                 doc = sentencizer(doc)
                 doc = wp(doc)
+            elif isinstance(doc, Doc):
+                doc = sentencizer(doc)
+                doc = wp(doc)
             if not isinstance(gold, GoldParse):
                 gold = GoldParse(doc, **gold)
             new_docs.append(doc)
@@ -99,10 +107,16 @@ class TransformersLanguage(Language):
         for doc in docs:
             assert doc._.get(ATTRS.last_hidden_state) is not None
         with self.disable_pipes(PIPES.tok2vec):
+            # This feels like a pretty unsatisfying hack, but the
+            # sentence boundaries mess up the NER and parser
+            # training, because they might be incorrect.
+            for doc in docs:
+                for token in doc:
+                    token.is_sent_start = None
             super().update(
                 docs,
                 golds,
-                drop=0.1,
+                drop=drop,
                 sgd=sgd,
                 losses=losses,
                 component_cfg=component_cfg,
@@ -142,7 +156,8 @@ class TransformersLanguage(Language):
             if "token_vector_width" not in component_cfg:
                 cfg["token_vector_width"] = token_vector_width
             component.cfg.update(cfg)
-            component.begin_training(pipeline=self.pipeline, sgd=False, **cfg)
+            component.begin_training(get_gold_tuples=lambda: [],
+                pipeline=self.pipeline, sgd=False, **cfg)
             assert component.model is not True
         optimizer = super().resume_training(sgd=sgd, **kwargs)
         optimizer.L2 = 0.0

@@ -1,8 +1,8 @@
-spacy>=2.2.1,<2.3.0
 transformers>=2.4.0,<2.6.0
+spacy>=3.0.0.dev3,<4.0.0
 torch>=1.0.0
 torchcontrib>=0.0.2,<0.1.0
-srsly>=0.0.7,<1.1.0
+srsly>=2.0.0,<3.0.0
 ftfy>=5.0.0,<6.0.0
 dataclasses>=0.6,<0.7; python_version < "3.7"
 importlib_metadata>=0.20; python_version < "3.8"

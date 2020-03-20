@@ -1,4 +1,6 @@
 import spacy.pipeline
+from spacy.syntax.nn_parser import ParserModel
+from thinc.v2v import Model
 from ..model_registry import get_model_function
 from ..util import PIPES
 
@@ -21,26 +23,27 @@ class TransformersEntityRecognizer(spacy.pipeline.EntityRecognizer):
 
     @classmethod
     def Model(cls, nr_class, **cfg):
-        hidden_width = cfg.get("hidden_width", 64)
-        token_vector_width = cfg.get("token_vector_width", 96)
+        hidden_width = cfg.get("hidden_width", nr_class)
+        token_vector_width = cfg.get("token_vector_width", nr_class)
         nr_feature = cls.nr_feature
-        maxout_pieces = cfg.get("maxout_pieces", 3)
+        maxout_pieces = cfg.get("maxout_pieces", 4)
         tensor_size = cfg.get("tensor_size", 768)
 
         configs = {
+            "nr_class": nr_class,
             "tok2vec": {
                 "arch": "tensor_affine_tok2vec",
                 "config": {
                     "output_size": token_vector_width,
                     "tensor_size": tensor_size
                 }
-            },
+            },   
             "lower": {
                 "arch": "precomputable_maxout",
                 "config": {
-                    "output_size": hidden_width,
-                    "input_size": token_vector_width,
-                    "number_features": nr_feature,
+                    "hidden_width": hidden_width,
+                    "token_vector_width": token_vector_width,
+                    "nr_feat": nr_feature,
                     "maxout_pieces": maxout_pieces
                 }
             },
@@ -51,7 +54,7 @@ class TransformersEntityRecognizer(spacy.pipeline.EntityRecognizer):
                     "input_size": hidden_width,
                     "drop_factor": 0.0
                 }
-            }`
+            }
         }
         tok2vec_arch = get_model_function(configs["tok2vec"]["arch"])
         lower_arch = get_model_function(configs["lower"]["arch"])
