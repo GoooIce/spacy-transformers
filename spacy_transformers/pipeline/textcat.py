@@ -13,7 +13,6 @@ class TransformersTextCategorizer(spacy.pipeline.TextCategorizer):
     """
 
     name = PIPES.textcat
-    factory = PIPES.textcat
 
     @classmethod
     def from_nlp(cls, nlp, **cfg):

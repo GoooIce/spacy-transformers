@@ -22,7 +22,6 @@ class TransformersTok2Vec(Pipe):
     """
 
     name = PIPES.tok2vec
-    factory = PIPES.tok2vec
 
     @classmethod
     def from_nlp(cls, nlp, **cfg):
